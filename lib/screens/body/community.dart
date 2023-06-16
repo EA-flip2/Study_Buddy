@@ -24,6 +24,7 @@ class _CommunityState extends State<Community> {
         'UserEmail': currentUser.email,
         'Message': quest_textcontroller.text,
         'TimeStamp': Timestamp.now(),
+        'flages': [],
       });
     }
   }
@@ -63,6 +64,8 @@ class _CommunityState extends State<Community> {
                       return Posted_quest(
                         message: post['Message'],
                         user: post['UserEmail'],
+                        postId: post.id,
+                        flages: List<String>.from(post['flages'] ?? []),
                       );
                     });
               } else if (snapshot.hasError) {
