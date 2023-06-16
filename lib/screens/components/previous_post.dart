@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/components/flaged.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,20 @@ class _Posted_questState extends State<Posted_quest> {
     setState(() {
       isflagged = !isflagged;
     });
-    // access doc
+    // access document in fire base
+    DocumentReference postRef =
+        FirebaseFirestore.instance.collection("User Post").doc(widget.postId);
+
+    if (isflagged) {
+      // add user to liked field
+      postRef.update({
+        'flages': FieldValue.arrayUnion([currentUser.email])
+      });
+    } else {
+      postRef.update({
+        'flages': FieldValue.arrayRemove([currentUser.email])
+      });
+    }
   }
 
   @override
@@ -54,7 +68,12 @@ class _Posted_questState extends State<Posted_quest> {
           ),
         ),
         // flag button by post
-        flagButton(isflagged: isflagged, onTap: toggleflag)
+        Column(
+          children: [
+            flagButton(isflagged: isflagged, onTap: toggleflag),
+            Text(widget.flages.length.toString()),
+          ],
+        )
       ],
     );
   }
