@@ -25,6 +25,7 @@ class _CommunityState extends State<Community> {
         'Message': quest_textcontroller.text,
         'TimeStamp': Timestamp.now(),
         'flages': [],
+        'likes': [],
       });
     }
   }
@@ -66,6 +67,7 @@ class _CommunityState extends State<Community> {
                         user: post['UserEmail'],
                         postId: post.id,
                         flages: List<String>.from(post['flages'] ?? []),
+                        likes: List<String>.from(post['likes'] ?? []),
                       );
                     });
               } else if (snapshot.hasError) {
