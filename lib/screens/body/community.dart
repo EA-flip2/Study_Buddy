@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/components/previous_post.dart';
+import 'package:firetrial/screens/components/tags.dart';
 import 'package:flutter/material.dart';
 
 class Community extends StatefulWidget {
@@ -29,15 +30,6 @@ class _CommunityState extends State<Community> {
       });
     }
   }
-
-  //Drop down list for tags
-  String null_select = "Tag your question";
-
-  List<String> tags = [
-    "Math",
-    "English",
-    "Applied",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -78,34 +70,41 @@ class _CommunityState extends State<Community> {
               return Center(child: CircularProgressIndicator());
             },
           )),
-          //text input
-          Row(
+          //Input Section
+          Column(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: quest_textcontroller,
-                  decoration: InputDecoration(
-                      hintText: "Have a Question ??",
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          quest_textcontroller.clear();
-                        },
-                        icon: Icon(Icons.clear), //clear text
-                      )),
-                  obscureText: false,
-                ),
-              ),
+              //Tags drop down
+              Tags(),
+              // textinput and send
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: quest_textcontroller,
+                      decoration: InputDecoration(
+                          hintText: "Have a Question ??",
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              quest_textcontroller.clear();
+                            },
+                            icon: Icon(Icons.clear), //clear text
+                          )),
+                      obscureText: false,
+                    ),
+                  ),
 
-              // Upload
-              MaterialButton(
-                onPressed: () {
-                  setState(() {
-                    postQuestion();
-                  });
-                },
-                color: Colors.blue,
-                child: Icon(Icons.send),
-              )
+                  // Upload
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {
+                        postQuestion();
+                      });
+                    },
+                    color: Colors.blue,
+                    child: Icon(Icons.send),
+                  )
+                ],
+              ),
             ],
           ),
         ],
