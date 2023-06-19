@@ -8,8 +8,43 @@ class Tags extends StatefulWidget {
 
 class _TagsState extends State<Tags> {
   //Navigte to tags
+  List<String> tagId = [];
+  List<String> questionId = [];
   List<String> tags = ["default", "A", "B"];
   String currentTag = "default";
+
+  // Creating the tag in Fire base and store id
+  void createTag(String Tag) {
+    FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': Tag,
+    }).then((DocumentReference docRef) {
+      tagId.add(docRef.id);
+    });
+  }
+
+  // Add a question to a tag and storing its reference
+  void addQuestion(String tagId, String question) {
+    FirebaseFirestore.instance
+        .collection("Tag")
+        .doc(tagId)
+        .collection("Question")
+        .add({
+      'Question': question,
+    }).then((DocumentReference questionReference) {
+      questionId.add(questionReference.id);
+    });
+  }
+
+  Future<bool> checkForTag(String tag) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection("Tag")
+        .where('tagName', isEqualTo: tag)
+        .get();
+
+    // Check if there is at least one matching document
+    bool hasMatchingDocument = querySnapshot.size > 0;
+    return hasMatchingDocument;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +61,16 @@ class _TagsState extends State<Tags> {
             );
           }).toList(),
           onChanged: ((value) {
-            setState(() {
+            setState(() async {
               currentTag = value!;
+              if (await checkForTag(currentTag)) {
+                // tag is already in existance add question
+              } else if (!await checkForTag(currentTag)) {
+                // create tag
+                createTag(currentTag);
+              } else {
+                CircularProgressIndicator();
+              }
             });
           }),
         ),
