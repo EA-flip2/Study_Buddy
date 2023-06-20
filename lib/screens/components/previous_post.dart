@@ -108,14 +108,3 @@ class _Posted_questState extends State<Posted_quest> {
     );
   }
 }
-
-/*Row(
-      children: [
-        Column(
-          children: [
-            Text(message),
-            Text(user),
-          ],
-        )
-      ],
-    ); */

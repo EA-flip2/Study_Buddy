@@ -10,7 +10,7 @@ class _TagsState extends State<Tags> {
   //Navigte to tags
   List<String> tagId = [];
   List<String> questionId = [];
-  List<String> tags = ["default", "A", "B"];
+  List<String> tags = ["default", "Telecom Policy", "Network Planning"];
   String currentTag = "default";
 
   // Creating the tag in Fire base and store id
@@ -21,6 +21,8 @@ class _TagsState extends State<Tags> {
       tagId.add(docRef.id);
     });
   }
+
+  // create a page
 
   // Add a question to a tag and storing its reference
   void addQuestion(String tagId, String question) {
@@ -35,6 +37,7 @@ class _TagsState extends State<Tags> {
     });
   }
 
+  // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("Tag")
@@ -65,9 +68,17 @@ class _TagsState extends State<Tags> {
             setState(() async {
               currentTag = value!;
               if (await checkForTag(currentTag)) {
-                // tag is already in existance add question
+                // tag is already in existance move to page add question
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (BuildContext context) {
+                  return TagPage(pageTitle: currentTag);
+                }));
               } else if (!await checkForTag(currentTag)) {
                 // create tag
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (BuildContext context) {
+                  return TagPage(pageTitle: currentTag);
+                }));
                 createTag(currentTag);
               } else {
                 const CircularProgressIndicator();
@@ -80,8 +91,32 @@ class _TagsState extends State<Tags> {
   }
 }
 
+class TagPage extends StatefulWidget {
+  final String pageTitle;
 
+  TagPage({
+    //!!! Key?key
+    Key? key,
+    required this.pageTitle,
+  }) : super(key: key);
 
+  @override
+  State<TagPage> createState() => _TagPageState();
+}
+
+class _TagPageState extends State<TagPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Q & A" + "for " + widget.pageTitle),
+      ),
+      body: Container(
+        color: Colors.amber,
+      ),
+    );
+  }
+}
 
 /*
 import 'package:flutter/material.dart';
