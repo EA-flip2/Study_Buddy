@@ -38,11 +38,12 @@ class _TagsState extends State<Tags> {
   Future<bool> checkForTag(String tag) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("Tag")
-        .where('tagName', isEqualTo: tag)
+        .where('TagName', isEqualTo: tag)
         .get();
 
     // Check if there is at least one matching document
     bool hasMatchingDocument = querySnapshot.size > 0;
+    debugPrint(hasMatchingDocument.toString());
     return hasMatchingDocument;
   }
 
@@ -69,7 +70,7 @@ class _TagsState extends State<Tags> {
                 // create tag
                 createTag(currentTag);
               } else {
-                CircularProgressIndicator();
+                const CircularProgressIndicator();
               }
             });
           }),
