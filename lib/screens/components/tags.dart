@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firetrial/screens/body/taged_pg.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tags extends StatefulWidget {
   @override
@@ -22,9 +23,18 @@ class _TagsState extends State<Tags> {
     setState(() {
       tagId.add(docRef.id);
     });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('tagId', tagId);
   }
 
-  /* This code caused lagged results
+  /*
+  .then((DocumentReference docRef) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    tagId.add(docRef.id);
+    await prefs.setStringList('tagId', tagId);
+    setState(() {});
+  });
+   This code caused lagged results
    Future createTag(String Tag) async {
     FirebaseFirestore.instance.collection("Tag").add({
       'TagName': Tag,
@@ -34,6 +44,21 @@ class _TagsState extends State<Tags> {
       });
     });
   }*/
+  @override
+  void initState() {
+    super.initState();
+    getStoredTagIds();
+  }
+
+  Future<void> getStoredTagIds() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? storedTagIds = prefs.getStringList('tagId');
+    if (storedTagIds != null) {
+      setState(() {
+        tagId = storedTagIds;
+      });
+    }
+  }
 
   // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
@@ -86,7 +111,6 @@ class _TagsState extends State<Tags> {
     );
   }
 }
-
 
 
 /*
