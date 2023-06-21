@@ -44,8 +44,11 @@ class _posted_tag_questState extends State<posted_tag_quest> {
       isflagged = !isflagged;
     });
     // access document in fire base
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection("User Post").doc(widget.postId);
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection("Tag")
+        .doc(widget.postId)
+        .collection("Question")
+        .doc(); // may require ID
 
     if (isflagged) {
       // add user to liked field
@@ -79,6 +82,8 @@ class _posted_tag_questState extends State<posted_tag_quest> {
       });
     }
   }
+
+  /// Access sub collection
 
   @override
   Widget build(BuildContext context) {

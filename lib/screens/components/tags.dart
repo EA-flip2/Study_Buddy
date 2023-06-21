@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/body/taged_pg.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,8 @@ class Tags extends StatefulWidget {
 }
 
 class _TagsState extends State<Tags> {
+  //get current User
+  final current_User = FirebaseAuth.instance.currentUser!;
   //Navigte to tags
   List<String> tagId = [];
   List<String> tags = ["default", "Telecom Policy", "Network Planning"];
@@ -24,32 +27,17 @@ class _TagsState extends State<Tags> {
       tagId.add(docRef.id);
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('tagId', tagId);
+    await prefs.setStringList('tagId', tagId); // store data - tagId
   }
 
-  /*
-  .then((DocumentReference docRef) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    tagId.add(docRef.id);
-    await prefs.setStringList('tagId', tagId);
-    setState(() {});
-  });
-   This code caused lagged results
-   Future createTag(String Tag) async {
-    FirebaseFirestore.instance.collection("Tag").add({
-      'TagName': Tag,
-    }).then((DocumentReference docRef) {
-      setState(() {
-        tagId.add(docRef.id);
-      });
-    });
-  }*/
+  ///*
   @override
   void initState() {
     super.initState();
-    getStoredTagIds();
+    //getStoredTagIds();
   }
 
+  // read stored data
   Future<void> getStoredTagIds() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? storedTagIds = prefs.getStringList('tagId');
@@ -58,7 +46,7 @@ class _TagsState extends State<Tags> {
         tagId = storedTagIds;
       });
     }
-  }
+  } //*/
 
   // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
@@ -114,6 +102,24 @@ class _TagsState extends State<Tags> {
 
 
 /*
+  /*
+  .then((DocumentReference docRef) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    tagId.add(docRef.id);
+    await prefs.setStringList('tagId', tagId);
+    setState(() {});
+  });
+   This code caused lagged results
+   Future createTag(String Tag) async {
+    FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': Tag,
+    }).then((DocumentReference docRef) {
+      setState(() {
+        tagId.add(docRef.id);
+      });
+    });
+  }*/
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

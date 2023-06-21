@@ -24,38 +24,26 @@ class TagPageState extends State<TagPage> {
   final current_User = FirebaseAuth.instance.currentUser!;
   //
   List<String> questionId = [];
-  //
-  void addQuestion(String tagId, String question) {
-    FirebaseFirestore.instance
-        .collection("Tag")
-        .doc(tagId)
-        .collection("Question")
-        .add({
-      'Question': question,
-    }).then((DocumentReference questionReference) {
-      setState(() {
-        questionId.add(questionReference.id);
-      });
-    });
-  }
 
   //Post Question
-  void post_tagged_quest(String docId) {
-    // dont post empty question
+  void postTagQuestion(String tagId) async {
+    //only post something
     if (taggedQuestion.text.isNotEmpty) {
-      FirebaseFirestore.instance
-          .collection("Tag")
-          .doc(docId)
-          .collection("Question")
-          .add({
-        'User': current_User.email,
-        'Question': taggedQuestion.text,
-        'Timestomp': Timestamp.now(),
-        'flages': [],
-        'likes': [],
+      DocumentReference docRef =
+          await FirebaseFirestore.instance.collection("Tag").doc(tagId);
+      setState(() {
+        docRef.collection("Questions").add({
+          'Question': taggedQuestion.text,
+          'User': current_User.email,
+          'Timestamp': Timestamp.now(),
+          'flages': [],
+          'likes': [],
+        });
       });
     }
   }
+
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -67,39 +55,39 @@ class TagPageState extends State<TagPage> {
         children: [
           //Display Previous Question
           Expanded(
-              child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("Tag")
-                .doc()
-                .collection("Question")
-                .orderBy(
-                  "TimeStamp",
-                  descending: false,
-                )
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      //get msg
-                      final post = snapshot.data!.docs[index];
-                      return posted_tag_quest(
-                        question: taggedQuestion.text,
-                        user: post['Question'],
-                        flages: List<String>.from(post['flages'] ?? []),
-                        postId: post.id,
-                        likes: List<String>.from(post['likes'] ?? []),
-                      );
-                    });
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error:${snapshot.error}'),
-                );
-              }
-              return Center(child: CircularProgressIndicator());
-            },
-          )),
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("Tag")
+                  .doc(widget.tagId)
+                  .collection("Questions")
+                  .orderBy(
+                    "Timestamp",
+                    descending: false,
+                  )
+                  .snapshots(), // acces subcollection from database;
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var doc = snapshot.data!.docs;
+                  return ListView.builder(
+                      itemCount: doc.length,
+                      itemBuilder: (context, index) {
+                        final post = doc[index];
+                        return posted_tag_quest(
+                            question: post['Question'],
+                            user: post['User'],
+                            flages: List<String>.from(post['flages'] ?? []),
+                            postId: post.id,
+                            likes: List<String>.from(post['likes'] ?? []));
+                      });
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error:${snapshot.error}'),
+                  );
+                }
+                return CircularProgressIndicator();
+              },
+            ),
+          ),
 
           // input Question Text
           TextField(
@@ -117,7 +105,8 @@ class TagPageState extends State<TagPage> {
           MaterialButton(
             onPressed: () {
               setState(() {
-                post_tagged_quest(widget.tagId);
+                postTagQuestion(widget.tagId);
+                //post or upload question
               });
             },
             color: Colors.blue,
