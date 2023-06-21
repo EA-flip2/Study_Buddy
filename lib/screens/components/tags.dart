@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firetrial/screens/body/taged_pg.dart';
 import 'package:flutter/material.dart';
 
 class Tags extends StatefulWidget {
@@ -9,33 +10,30 @@ class Tags extends StatefulWidget {
 class _TagsState extends State<Tags> {
   //Navigte to tags
   List<String> tagId = [];
-  List<String> questionId = [];
   List<String> tags = ["default", "Telecom Policy", "Network Planning"];
   String currentTag = "default";
 
   // Creating the tag in Fire base and store id
-  void createTag(String Tag) {
-    FirebaseFirestore.instance.collection("Tag").add({
-      'TagName': Tag,
-    }).then((DocumentReference docRef) {
+  Future<void> createTag(String tag) async {
+    DocumentReference docRef =
+        await FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': tag,
+    });
+    setState(() {
       tagId.add(docRef.id);
     });
   }
 
-  // create a page
-
-  // Add a question to a tag and storing its reference
-  void addQuestion(String tagId, String question) {
-    FirebaseFirestore.instance
-        .collection("Tag")
-        .doc(tagId)
-        .collection("Question")
-        .add({
-      'Question': question,
-    }).then((DocumentReference questionReference) {
-      questionId.add(questionReference.id);
+  /* This code caused lagged results
+   Future createTag(String Tag) async {
+    FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': Tag,
+    }).then((DocumentReference docRef) {
+      setState(() {
+        tagId.add(docRef.id);
+      });
     });
-  }
+  }*/
 
   // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
@@ -64,26 +62,24 @@ class _TagsState extends State<Tags> {
               value: item,
             );
           }).toList(),
-          onChanged: ((value) {
-            setState(() async {
+          onChanged: ((value) async {
+            setState(() {
               currentTag = value!;
-              if (await checkForTag(currentTag)) {
-                // tag is already in existance move to page add question
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return TagPage(pageTitle: currentTag);
-                }));
-              } else if (!await checkForTag(currentTag)) {
-                // create tag
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return TagPage(pageTitle: currentTag);
-                }));
-                createTag(currentTag);
-              } else {
-                const CircularProgressIndicator();
-              }
             });
+            if (await checkForTag(currentTag)) {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return TagPage(
+                    pageTitle: currentTag,
+                    tagId: tagId[tags.indexOf(currentTag)]);
+              }));
+            } else if (!await checkForTag(currentTag)) {
+              // create tag
+              await createTag(currentTag);
+              print(tagId); // clear this
+            } else {
+              const CircularProgressIndicator();
+            }
           }),
         ),
       ],
@@ -91,32 +87,7 @@ class _TagsState extends State<Tags> {
   }
 }
 
-class TagPage extends StatefulWidget {
-  final String pageTitle;
 
-  TagPage({
-    //!!! Key?key
-    Key? key,
-    required this.pageTitle,
-  }) : super(key: key);
-
-  @override
-  State<TagPage> createState() => _TagPageState();
-}
-
-class _TagPageState extends State<TagPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Q & A" + "for " + widget.pageTitle),
-      ),
-      body: Container(
-        color: Colors.amber,
-      ),
-    );
-  }
-}
 
 /*
 import 'package:flutter/material.dart';
