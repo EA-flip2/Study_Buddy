@@ -34,7 +34,7 @@ class _TagsState extends State<Tags> {
   @override
   void initState() {
     super.initState();
-    //getStoredTagIds();
+    getStoredTagIds();
   }
 
   // read stored data
@@ -46,7 +46,7 @@ class _TagsState extends State<Tags> {
         tagId = storedTagIds;
       });
     }
-  } //*/
+  } // */
 
   // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
@@ -86,12 +86,26 @@ class _TagsState extends State<Tags> {
                     pageTitle: currentTag,
                     tagId: tagId[tags.indexOf(currentTag)]);
               }));
+              print("Done");
+              print(tagId); // clear this
+              print(tagId.length);
+              print(tags.indexOf(currentTag));
+              /*SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
+              await preferences.remove('tagId');*/
             } else if (!await checkForTag(currentTag)) {
               // create tag
               await createTag(currentTag);
+              /*Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return TagPage(
+                    pageTitle: currentTag,
+                    tagId: tagId[tags.indexOf(currentTag)]);
+              }));*/
               print(tagId); // clear this
+              print(tagId.length);
             } else {
-              const CircularProgressIndicator();
+              const Center(child: CircularProgressIndicator());
             }
           }),
         ),

@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 class posted_tag_quest extends StatefulWidget {
   final String question;
   final String user;
-  final String postId; // to identify post
+  final String postId; // to identify tag
+  final String quest_postId; // to identify question
   final List<String> flages; // keep track of flags
   final List<String> likes;
   const posted_tag_quest({
@@ -16,6 +17,7 @@ class posted_tag_quest extends StatefulWidget {
     required this.user,
     required this.flages,
     required this.postId,
+    required this.quest_postId,
     required this.likes,
   });
 
@@ -48,7 +50,7 @@ class _posted_tag_questState extends State<posted_tag_quest> {
         .collection("Tag")
         .doc(widget.postId)
         .collection("Question")
-        .doc(); // may require ID
+        .doc(widget.quest_postId); // require ID of question doc
 
     if (isflagged) {
       // add user to liked field
@@ -68,8 +70,11 @@ class _posted_tag_questState extends State<posted_tag_quest> {
       isLiked = !isLiked;
     });
     // access document in fire base
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection("User Post").doc(widget.postId);
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection("User Post")
+        .doc(widget.postId)
+        .collection("Question")
+        .doc();
 
     if (isLiked) {
       // add user to liked field

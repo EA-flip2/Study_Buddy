@@ -23,14 +23,15 @@ class TagPageState extends State<TagPage> {
   //get current User
   final current_User = FirebaseAuth.instance.currentUser!;
   //
-  List<String> questionId = [];
+  String questionId = "";
 
   //Post Question
-  void postTagQuestion(String tagId) async {
+  void postTagQuestion(String tagId) {
     //only post something
     if (taggedQuestion.text.isNotEmpty) {
       DocumentReference docRef =
-          await FirebaseFirestore.instance.collection("Tag").doc(tagId);
+          // ignore: await_only_futures
+          FirebaseFirestore.instance.collection("Tag").doc(tagId);
       setState(() {
         docRef.collection("Questions").add({
           'Question': taggedQuestion.text,
@@ -40,6 +41,7 @@ class TagPageState extends State<TagPage> {
           'likes': [],
         });
       });
+      questionId = docRef.id;
     }
   }
 
@@ -76,6 +78,7 @@ class TagPageState extends State<TagPage> {
                             question: post['Question'],
                             user: post['User'],
                             flages: List<String>.from(post['flages'] ?? []),
+                            quest_postId: questionId,
                             postId: post.id,
                             likes: List<String>.from(post['likes'] ?? []));
                       });
