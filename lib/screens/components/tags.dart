@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firetrial/screens/body/taged_pg.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tags extends StatefulWidget {
   @override
@@ -7,35 +10,43 @@ class Tags extends StatefulWidget {
 }
 
 class _TagsState extends State<Tags> {
+  //get current User
+  final current_User = FirebaseAuth.instance.currentUser!;
   //Navigte to tags
   List<String> tagId = [];
-  List<String> questionId = [];
   List<String> tags = ["default", "Telecom Policy", "Network Planning"];
   String currentTag = "default";
 
   // Creating the tag in Fire base and store id
-  void createTag(String Tag) {
-    FirebaseFirestore.instance.collection("Tag").add({
-      'TagName': Tag,
-    }).then((DocumentReference docRef) {
+  Future<void> createTag(String tag) async {
+    DocumentReference docRef =
+        await FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': tag,
+    });
+    setState(() {
       tagId.add(docRef.id);
     });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('tagId', tagId); // store data - tagId
   }
 
-  // create a page
-
-  // Add a question to a tag and storing its reference
-  void addQuestion(String tagId, String question) {
-    FirebaseFirestore.instance
-        .collection("Tag")
-        .doc(tagId)
-        .collection("Question")
-        .add({
-      'Question': question,
-    }).then((DocumentReference questionReference) {
-      questionId.add(questionReference.id);
-    });
+  ///*
+  @override
+  void initState() {
+    super.initState();
+    getStoredTagIds();
   }
+
+  // read stored data
+  Future<void> getStoredTagIds() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? storedTagIds = prefs.getStringList('tagId');
+    if (storedTagIds != null) {
+      setState(() {
+        tagId = storedTagIds;
+      });
+    }
+  } // */
 
   // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
@@ -64,26 +75,38 @@ class _TagsState extends State<Tags> {
               value: item,
             );
           }).toList(),
-          onChanged: ((value) {
-            setState(() async {
+          onChanged: ((value) async {
+            setState(() {
               currentTag = value!;
-              if (await checkForTag(currentTag)) {
-                // tag is already in existance move to page add question
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return TagPage(pageTitle: currentTag);
-                }));
-              } else if (!await checkForTag(currentTag)) {
-                // create tag
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return TagPage(pageTitle: currentTag);
-                }));
-                createTag(currentTag);
-              } else {
-                const CircularProgressIndicator();
-              }
             });
+            if (await checkForTag(currentTag)) {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return TagPage(
+                    pageTitle: currentTag,
+                    tagId: tagId[tags.indexOf(currentTag)]);
+              }));
+              print("Done");
+              print(tagId); // clear this
+              print(tagId.length);
+              print(tags.indexOf(currentTag));
+              /*SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
+              await preferences.remove('tagId');*/
+            } else if (!await checkForTag(currentTag)) {
+              // create tag
+              await createTag(currentTag);
+              /*Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return TagPage(
+                    pageTitle: currentTag,
+                    tagId: tagId[tags.indexOf(currentTag)]);
+              }));*/
+              print(tagId); // clear this
+              print(tagId.length);
+            } else {
+              const Center(child: CircularProgressIndicator());
+            }
           }),
         ),
       ],
@@ -91,34 +114,26 @@ class _TagsState extends State<Tags> {
   }
 }
 
-class TagPage extends StatefulWidget {
-  final String pageTitle;
-
-  TagPage({
-    //!!! Key?key
-    Key? key,
-    required this.pageTitle,
-  }) : super(key: key);
-
-  @override
-  State<TagPage> createState() => _TagPageState();
-}
-
-class _TagPageState extends State<TagPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Q & A" + "for " + widget.pageTitle),
-      ),
-      body: Container(
-        color: Colors.amber,
-      ),
-    );
-  }
-}
 
 /*
+  /*
+  .then((DocumentReference docRef) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    tagId.add(docRef.id);
+    await prefs.setStringList('tagId', tagId);
+    setState(() {});
+  });
+   This code caused lagged results
+   Future createTag(String Tag) async {
+    FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': Tag,
+    }).then((DocumentReference docRef) {
+      setState(() {
+        tagId.add(docRef.id);
+      });
+    });
+  }*/
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
