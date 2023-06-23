@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firetrial/screens/body/taged_pg.dart';
+import 'package:firetrial/screens/pages/taged_pg.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Tags extends StatefulWidget {
   @override
@@ -10,55 +9,43 @@ class Tags extends StatefulWidget {
 }
 
 class _TagsState extends State<Tags> {
-  //get current User
   final current_User = FirebaseAuth.instance.currentUser!;
-  //Navigte to tags
-  List<String> tagId = [];
   List<String> tags = ["default", "Telecom Policy", "Network Planning"];
   String currentTag = "default";
 
-  // Creating the tag in Fire base and store id
   Future<void> createTag(String tag) async {
     DocumentReference docRef =
         await FirebaseFirestore.instance.collection("Tag").add({
       'TagName': tag,
+      'TagId': '',
     });
     setState(() {
-      tagId.add(docRef.id);
+      docRef.update({'TagId': docRef.id});
     });
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('tagId', tagId); // store data - tagId
   }
 
-  ///*
-  @override
-  void initState() {
-    super.initState();
-    getStoredTagIds();
-  }
+  Future<String?> getTagId(String tagName) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Tag')
+        .where('TagName', isEqualTo: tagName)
+        .get();
 
-  // read stored data
-  Future<void> getStoredTagIds() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? storedTagIds = prefs.getStringList('tagId');
-    if (storedTagIds != null) {
-      setState(() {
-        tagId = storedTagIds;
-      });
+    if (querySnapshot.size > 0) {
+      DocumentSnapshot documentSnapshot = querySnapshot.docs[0];
+      String tagId = documentSnapshot.get('TagId');
+      return tagId;
+    } else {
+      return null;
     }
-  } // */
+  }
 
-  // make sure tags don't repeat
   Future<bool> checkForTag(String tag) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("Tag")
         .where('TagName', isEqualTo: tag)
         .get();
 
-    // Check if there is at least one matching document
-    bool hasMatchingDocument = querySnapshot.size > 0;
-    debugPrint(hasMatchingDocument.toString());
-    return hasMatchingDocument;
+    return querySnapshot.size > 0;
   }
 
   @override
@@ -75,116 +62,58 @@ class _TagsState extends State<Tags> {
               value: item,
             );
           }).toList(),
-          onChanged: ((value) async {
+          onChanged: (value) async {
             setState(() {
               currentTag = value!;
             });
+            String tagId = await getTagId(currentTag) ?? "Error";
             if (await checkForTag(currentTag)) {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (BuildContext context) {
-                return TagPage(
-                    pageTitle: currentTag,
-                    tagId: tagId[tags.indexOf(currentTag)]);
-              }));
-              print("Done");
-              print(tagId); // clear this
-              print(tagId.length);
-              print(tags.indexOf(currentTag));
-              /*SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              await preferences.remove('tagId');*/
-            } else if (!await checkForTag(currentTag)) {
-              // create tag
-              await createTag(currentTag);
-              /*Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (BuildContext context) {
-                return TagPage(
-                    pageTitle: currentTag,
-                    tagId: tagId[tags.indexOf(currentTag)]);
-              }));*/
-              print(tagId); // clear this
-              print(tagId.length);
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) {
+                  print("/////////////////////////////");
+                  print(" ");
+                  print(currentTag);
+                  print(tagId);
+                  return /*Tag_P(
+                    text: currentTag,
+                    tagId: tagId,
+                  ); */
+                      TagPage(pageTitle: currentTag, tagId: tagId);
+                },
+              ));
             } else {
-              const Center(child: CircularProgressIndicator());
+              await createTag(currentTag);
             }
-          }),
+          },
         ),
       ],
     );
   }
 }
 
+class Tag_P extends StatelessWidget {
+  final String text;
+  final String? tagId;
 
-/*
-  /*
-  .then((DocumentReference docRef) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    tagId.add(docRef.id);
-    await prefs.setStringList('tagId', tagId);
-    setState(() {});
-  });
-   This code caused lagged results
-   Future createTag(String Tag) async {
-    FirebaseFirestore.instance.collection("Tag").add({
-      'TagName': Tag,
-    }).then((DocumentReference docRef) {
-      setState(() {
-        tagId.add(docRef.id);
-      });
-    });
-  }*/
+  const Tag_P({
+    Key? key,
+    required this.text,
+    required this.tagId,
+  }) : super(key: key);
 
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Nested List to Firestore'),
-        ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () => saveNestedList(),
-            child: Text('Save Nested List'),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(text),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text(tagId ?? 'No tag ID found'),
+          ],
         ),
       ),
     );
   }
-
-  void saveNestedList() {
-    List<List<String>> nestedList = [
-      ['Apple', 'Banana', 'Cherry'],
-      ['Dog', 'Cat', 'Elephant'],
-      ['Red', 'Green', 'Blue']
-    ];
-
-    List<List<dynamic>> firestoreList = nestedList.map((list) => list.cast<dynamic>()).toList();
-
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    DocumentReference docRef = firestore.collection('your_collection').doc('your_document');
-
-    docRef.set({
-      'nestedListField': firestoreList,
-    }).then((_) {
-      print('Nested list saved to Firestore successfully!');
-    }).catchError((error) {
-      print('Failed to save nested list to Firestore: $error');
-    });
-  }
 }
-
-*/

@@ -49,7 +49,7 @@ class _posted_tag_questState extends State<posted_tag_quest> {
     DocumentReference postRef = FirebaseFirestore.instance
         .collection("Tag")
         .doc(widget.postId)
-        .collection("Question")
+        .collection("Questions")
         .doc(widget.quest_postId); // require ID of question doc
 
     if (isflagged) {
@@ -64,17 +64,30 @@ class _posted_tag_questState extends State<posted_tag_quest> {
     }
   }
 
-  // toggle like
   void togglelike() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+
+    DocumentReference postRef =
+        FirebaseFirestore.instance.collection("Tag").doc(widget.postId);
+    // question id
+    print("Toggle");
+    print(widget.quest_postId);
+    print(widget.postId);
+    print(".... ");
+  }
+  // toggle like
+  /*void togglelike() {
     setState(() {
       isLiked = !isLiked;
     });
     // access document in fire base
     DocumentReference postRef = FirebaseFirestore.instance
-        .collection("User Post")
+        .collection("Tag")
         .doc(widget.postId)
-        .collection("Question")
-        .doc();
+        .collection("Questions")
+        .doc(widget.quest_postId); // question id
 
     if (isLiked) {
       // add user to liked field
@@ -86,7 +99,7 @@ class _posted_tag_questState extends State<posted_tag_quest> {
         'likes': FieldValue.arrayRemove([currentUser.email])
       });
     }
-  }
+  }*/
 
   /// Access sub collection
 
