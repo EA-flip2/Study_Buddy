@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/components/post_tag_quest.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TagPage extends StatefulWidget {
   final String pageTitle;
@@ -23,29 +24,31 @@ class TagPageState extends State<TagPage> {
   //get current User
   final current_User = FirebaseAuth.instance.currentUser!;
   //
-  String questionId = "";
+  String? questionId;
 
   //Post Question
-  void postTagQuestion(String tagId) {
-    //only post something
+  Future<void> postTagQuestion(String tagId) async {
     if (taggedQuestion.text.isNotEmpty) {
-      DocumentReference docRef =
-          // ignore: await_only_futures
+      DocumentReference tagDocRef =
           FirebaseFirestore.instance.collection("Tag").doc(tagId);
-      setState(() {
-        docRef.collection("Questions").add({
-          'Question': taggedQuestion.text,
-          'User': current_User.email,
-          'Timestamp': Timestamp.now(),
-          'flages': [],
-          'likes': [],
-        });
-      });
-      questionId = docRef.id;
-    }
-  }
 
-  //
+      DocumentReference questionDocRef =
+          await tagDocRef.collection("Questions").add({
+        'Question': taggedQuestion.text,
+        'User': current_User.email,
+        'Timestamp': Timestamp.now(),
+        'flages': [],
+        'likes': [],
+        'TagId': '',
+      });
+      String? questionId = questionDocRef.id;
+      setState(() {
+        questionDocRef.update({'TagId': questionId});
+      });
+    }
+
+    //
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,13 +77,18 @@ class TagPageState extends State<TagPage> {
                       itemCount: doc.length,
                       itemBuilder: (context, index) {
                         final post = doc[index];
+                        DocumentReference actual_tagId = FirebaseFirestore
+                            .instance
+                            .collection("Tag")
+                            .doc(widget.tagId);
                         return posted_tag_quest(
-                            question: post['Question'],
-                            user: post['User'],
-                            flages: List<String>.from(post['flages'] ?? []),
-                            quest_postId: questionId,
-                            postId: post.id,
-                            likes: List<String>.from(post['likes'] ?? []));
+                          question: post['Question'],
+                          user: post['User'],
+                          flages: List<String>.from(post['flages'] ?? []),
+                          postId: actual_tagId.id, //
+                          quest_postId: post.id,
+                          likes: List<String>.from(post['likes'] ?? []),
+                        );
                       });
                 } else if (snapshot.hasError) {
                   return Center(
@@ -120,3 +128,41 @@ class TagPageState extends State<TagPage> {
     );
   }
 }
+
+
+/*
+  Future<void> createTag(String tag) async {
+    DocumentReference docRef =
+        await FirebaseFirestore.instance.collection("Tag").add({
+      'TagName': tag,
+      'TagId': '',
+    });
+    setState(() {
+      docRef.update({'TagId': docRef.id});
+    });
+  }
+*/
+    /*void postTagQuestion(String tagId) {
+    //only post something
+    if (taggedQuestion.text.isNotEmpty) {
+      DocumentReference docRef =
+          // ignore: await_only_futures
+          FirebaseFirestore.instance.collection("Tag").doc(tagId);
+      setState(() {
+        docRef.collection("Questions").add({
+          'Question': taggedQuestion.text,
+          'User': current_User.email,
+          'Timestamp': Timestamp.now(),
+          'flages': [],
+          'likes': [],
+          'TagId': '',
+        });
+        setState(() {
+          setState(() {
+            docRef.update({'TagId': docRef.id});
+          });
+        });
+      });
+    }
+  }*/
+    //

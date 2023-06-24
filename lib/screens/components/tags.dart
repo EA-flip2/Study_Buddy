@@ -70,10 +70,6 @@ class _TagsState extends State<Tags> {
             if (await checkForTag(currentTag)) {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) {
-                  print("/////////////////////////////");
-                  print(" ");
-                  print(currentTag);
-                  print(tagId);
                   return /*Tag_P(
                     text: currentTag,
                     tagId: tagId,

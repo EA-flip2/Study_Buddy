@@ -68,14 +68,23 @@ class _posted_tag_questState extends State<posted_tag_quest> {
     setState(() {
       isLiked = !isLiked;
     });
+    // access document in fire base
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection("Tag")
+        .doc(widget.postId)
+        .collection("Questions")
+        .doc(widget.quest_postId); // question id
 
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection("Tag").doc(widget.postId);
-    // question id
-    print("Toggle");
-    print(widget.quest_postId);
-    print(widget.postId);
-    print(".... ");
+    if (isLiked) {
+      // add user to liked field
+      postRef.update({
+        'likes': FieldValue.arrayUnion([currentUser.email])
+      });
+    } else {
+      postRef.update({
+        'likes': FieldValue.arrayRemove([currentUser.email])
+      });
+    }
   }
   // toggle like
   /*void togglelike() {
