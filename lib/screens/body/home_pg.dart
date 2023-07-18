@@ -1,4 +1,14 @@
+
+import 'package:firetrial/screens/body/pomodoro_home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'dart:async';
+
+
+
+
+
+
 
 class Personal extends StatefulWidget {
   const Personal({Key? key}) : super(key: key);
@@ -41,6 +51,14 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var navigator = Navigator;
+    const bottomNavigationBarItem2 = BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+           
+    );
+    
+  
     return Scaffold(
       body: PageView(
         controller: controller,
@@ -51,8 +69,8 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
         },
         children: [
           Container(color: Colors.amber),
-          Container(color: Colors.pinkAccent)
-          Container(color: Colors.orange),
+          Container(color: Colors.pinkAccent),
+          Container(color: Colors.orange)
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -68,10 +86,7 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
           });
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'User',
@@ -100,3 +115,8 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
     );
   }
 }
+
+class FlatButton {
+}
+
+
