@@ -34,81 +34,98 @@ class _CommunityState extends State<Community> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          //display
-          Expanded(
-              child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("User Post")
-                .orderBy(
-                  "TimeStamp",
-                  descending: false,
-                )
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      //get msg
-                      final post = snapshot.data!.docs[index];
-                      return Posted_quest(
-                        message: post['Message'],
-                        user: post['UserEmail'],
-                        postId: post.id,
-                        flages: List<String>.from(post['flages'] ?? []),
-                        likes: List<String>.from(post['likes'] ?? []),
-                      );
-                    });
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error:${snapshot.error}'),
-                );
-              }
-              return Center(child: CircularProgressIndicator());
-            },
-          )),
-          //Input Section
-          Column(
-            children: [
-              //Tags drop down
-              Tags(),
-              // textinput and send
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: quest_textcontroller,
-                      decoration: InputDecoration(
-                          hintText: "Have a Question ??",
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              quest_textcontroller.clear();
-                            },
-                            icon: Icon(Icons.clear), //clear text
-                          )),
-                      obscureText: false,
+        body: Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        //display
+        Expanded(
+            child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("User Post")
+              .orderBy(
+                "TimeStamp",
+                descending: false,
+              )
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    //get msg
+                    final post = snapshot.data!.docs[index];
+                    return Posted_quest(
+                      message: post['Message'],
+                      user: post['UserEmail'],
+                      postId: post.id,
+                      flages: List<String>.from(post['flages'] ?? []),
+                      likes: List<String>.from(post['likes'] ?? []),
+                    );
+                  });
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error:${snapshot.error}'),
+              );
+            }
+            return Center(child: CircularProgressIndicator());
+          },
+        )),
+        //Input Section
+        Row(
+          children: [
+            Expanded(
+                child: SizedBox(
+              height: 48,
+              child: TextField(
+                controller: quest_textcontroller,
+                decoration: InputDecoration(
+                  hintText: "Have a Question?",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      quest_textcontroller.clear();
+                    },
+                    icon: Icon(
+                      Icons.clear,
+                      color: Colors.grey,
                     ),
                   ),
-
-                  // Upload
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() {
-                        postQuestion();
-                      });
-                    },
-                    color: Colors.blue,
-                    child: Icon(Icons.send),
-                  )
-                ],
+                  fillColor: Colors.grey[200],
+                  filled: true,
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(10.0)),
+                ),
+                obscureText: false,
               ),
-            ],
-          ),
-        ],
-      ),
-    );
+            )),
+            SizedBox(
+              width: 30,
+            ),
+            SizedBox(
+              height: 48.0,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    postQuestion();
+                    quest_textcontroller.clear();
+                  });
+                },
+                child: Icon(Icons.send),
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+          ],
+        )
+      ],
+    ));
   }
 }
