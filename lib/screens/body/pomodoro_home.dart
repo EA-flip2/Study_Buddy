@@ -1,28 +1,35 @@
 import 'dart:async';
-
-import 'package:firetrial/screens/body/pomodoro_home.dart';
 import 'package:flutter/material.dart';
 
 
-void main() {
-  runApp(MyApp());
-}
+class PomodoroPage extends StatelessWidget {
+  const PomodoroPage({Key? key}) : super(key: key);
 
-class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: PomodoroPage(),
-    );
+    return const MaterialApp();
   }
 }
 
-class PomodoroPage extends StatefulWidget {
+class PomodoroPageStateful extends StatefulWidget {
+  const PomodoroPageStateful({Key? key}) : super(key: key);
+
   @override
   _PomodoroPageState createState() => _PomodoroPageState();
 }
 
-class _PomodoroPageState extends State<PomodoroPage> {
+class _PomodoroPageState extends State<PomodoroPageStateful> {
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(home: PomodoroPage(),
+    );
+  }
+}
+
+
+
+
+class _PomodoroPageStatefulState extends State<PomodoroPageStateful> {
   int _minutes = 25;
   int _seconds = 0;
   bool _isRunning = false;
@@ -31,7 +38,7 @@ class _PomodoroPageState extends State<PomodoroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pomodoro Timer'),
+        title: const Text('Pomodoro Timer'),
       ),
       body: Center(
         child: Column(
@@ -39,20 +46,20 @@ class _PomodoroPageState extends State<PomodoroPage> {
           children: [
             Text(
               '$_minutes:${_seconds.toString().padLeft(2, '0')}',
-              style: TextStyle(fontSize: 48),
+              style: const TextStyle(fontSize: 48),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton (
                   onPressed: _isRunning ? null : _startTimer,
-                  child: Text('Start'),
+                  child: const Text('Start'),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: _isRunning ? _stopTimer : null,
-                  child: Text('Stop'),
+                  child: const Text('Stop'),
                 ),
               ],
             ),

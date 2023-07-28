@@ -1,14 +1,6 @@
 
-import 'package:firetrial/screens/body/pomodoro_home.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'dart:async';
-
-
-
-
-
-
 
 class Personal extends StatefulWidget {
   const Personal({Key? key}) : super(key: key);
@@ -20,8 +12,8 @@ class Personal extends StatefulWidget {
 class Event {
   final Color color;
   final String title;
-
-  const Event({required this.color, required this.title});
+  static List<String> eventsList = ['Upcoming Events Calendar', 'Pending Events', 'Missed Events', 'Ongoing Events'];
+  Event({required this.color, required this.title});
 }
 
 class _PersonalState extends State<Personal> with TickerProviderStateMixin {
@@ -29,49 +21,36 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
   final PageController controller = PageController();
   late TabController tabController;
 
-  final List<Event> events = [
-    Event(color: Colors.blue, title: 'Upcoming Events Calendar'),
-    Event(color: Colors.red, title: 'Pending Events'),
-    Event(color: Colors.green, title: 'Missed Events'),
-    Event(color: Colors.yellow, title: 'Ongoing Events'),
-  ];
-
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: events.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    tabController.dispose();
-    controller.dispose();
-    super.dispose();
+    tabController = TabController(length: Event.eventsList.length, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
-    var navigator = Navigator;
-    const bottomNavigationBarItem2 = BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-           
-    );
-    
-  
     return Scaffold(
-      body: PageView(
-        controller: controller,
-        onPageChanged: (value) {
-          setState(() {
-            currentIndex = value;
-          });
-        },
-        children: [
-          Container(color: Colors.amber),
-          Container(color: Colors.pinkAccent),
-          Container(color: Colors.orange)
-        ],
+      appBar: AppBar(
+        title: Text('Task'),
+        bottom: TabBar(
+          controller: tabController,
+          tabs: Event.eventsList.map((event) {
+            return Tab(
+              text: event,
+            );
+          }).toList(),
+        ),
+      ),
+      body: TabBarView(
+        controller: tabController,
+        children: Event.eventsList.map((event) {
+          return Container(
+            color: Colors.amber, // Change this color to the color property of your Event object if needed.
+            child: Center(
+              child: Text(event),
+            ),
+          );
+        }).toList(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
@@ -86,7 +65,10 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
           });
         },
         items: const [
-          
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'User',
@@ -99,24 +81,16 @@ class _PersonalState extends State<Personal> with TickerProviderStateMixin {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        child: Icon(Icons.add),
-      ),
-      endDrawer: TabBarView(
-        controller: tabController,
-        children: events.map((event) {
-          return Container(
-            color: event.color,
-            child: Center(
-              child: Text(event.title),
-            ),
-          );
-        }).toList(),
+        child: const Icon(Icons.task_alt_sharp),
       ),
     );
   }
-}
 
-class FlatButton {
+  @override
+  void dispose() {
+    tabController.dispose();
+    controller.dispose();
+    super.dispose();
+  }
 }
-
 
