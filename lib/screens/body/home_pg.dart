@@ -2,95 +2,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+
 class Personal extends StatefulWidget {
-  const Personal({Key? key}) : super(key: key);
+  const Personal({super.key});
 
   @override
   State<Personal> createState() => _PersonalState();
 }
 
-class Event {
-  final Color color;
-  final String title;
-  static List<String> eventsList = ['Upcoming Events Calendar', 'Pending Events', 'Missed Events', 'Ongoing Events'];
-  Event({required this.color, required this.title});
-}
-
-class _PersonalState extends State<Personal> with TickerProviderStateMixin {
-  int currentIndex = 0;
+class _PersonalState extends State<Personal> {
+  int currentIndex_ = 0;
   final PageController controller = PageController();
-  late TabController tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: Event.eventsList.length, vsync: this);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Task'),
-        bottom: TabBar(
-          controller: tabController,
-          tabs: Event.eventsList.map((event) {
-            return Tab(
-              text: event,
-            );
-          }).toList(),
-        ),
-      ),
-      body: TabBarView(
-        controller: tabController,
-        children: Event.eventsList.map((event) {
-          return Container(
-            color: Colors.amber, // Change this color to the color property of your Event object if needed.
-            child: Center(
-              child: Text(event),
-            ),
-          );
-        }).toList(),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
+    return Scaffold( 
+      body: PageView(
+        controller: controller,
+        onPageChanged: (value) {
           setState(() {
-            currentIndex = index;
-            controller.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.ease,
-            );
+            currentIndex_ = value;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+        children: [
+          Container(
+            color: Colors.amber,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'User',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Events',
+          Container(
+            color: Colors.pinkAccent,
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.task_alt_sharp),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.local_activity), label: 'activities'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.leaderboard_rounded), label: 'leader board'),
+        ],
+        currentIndex: currentIndex_,
+        onTap: (value) {
+          setState(() {
+            controller.animateToPage(value,
+                duration: const Duration(milliseconds: 100), curve: Curves.easeIn);
+          });
+        },
       ),
     );
   }
-
-  @override
-  void dispose() {
-    tabController.dispose();
-    controller.dispose();
-    super.dispose();
-  }
 }
-
+ 
