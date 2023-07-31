@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/components/post_tag_quest.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TagPage extends StatefulWidget {
   final String pageTitle;
@@ -95,7 +94,7 @@ class TagPageState extends State<TagPage> {
                     child: Text('Error:${snapshot.error}'),
                   );
                 }
-                return CircularProgressIndicator();
+                return Center(child: CircularProgressIndicator());
               },
             ),
           ),

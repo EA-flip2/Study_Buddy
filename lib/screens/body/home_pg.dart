@@ -1,3 +1,4 @@
+import 'package:firetrial/screens/pages/activity.dart';
 import 'package:flutter/material.dart';
 
 class Personal extends StatefulWidget {
@@ -22,9 +23,7 @@ class _PersonalState extends State<Personal> {
           });
         },
         children: [
-          Container(
-            color: Colors.amber,
-          ),
+          activity(),
           Container(
             color: Colors.pinkAccent,
           ),
