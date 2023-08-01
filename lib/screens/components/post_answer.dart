@@ -2,32 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firetrial/screens/components/flaged.dart';
 import 'package:firetrial/screens/components/likebutton.dart';
+import 'package:firetrial/tools/com_controller.dart';
 import 'package:flutter/material.dart';
 
-class Posted_quest extends StatefulWidget {
-  final String message;
+class quest_contribtion extends StatefulWidget {
+  final String answer;
   final String user;
-  final String postId; // to identify post
+  final String quest_Id;
+  final String postId; // to identify tag
+  final String answer_postId; // to identify question
   final List<String> flages; // keep track of flags
   final List<String> likes;
-  const Posted_quest({
+  const quest_contribtion({
     super.key,
-    required this.message,
+    required this.answer,
     required this.user,
+    required this.quest_Id,
     required this.flages,
     required this.postId,
+    required this.answer_postId,
     required this.likes,
   });
 
   @override
-  State<Posted_quest> createState() => _Posted_questState();
+  State<quest_contribtion> createState() => _quest_contribtionState();
 }
 
-class _Posted_questState extends State<Posted_quest> {
+class _quest_contribtionState extends State<quest_contribtion> {
   //user
   final currentUser = FirebaseAuth.instance.currentUser!;
   bool isflagged = false;
   bool isLiked = false;
+  bool ispushed = false;
+  final contibuted_answer = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
@@ -44,14 +51,20 @@ class _Posted_questState extends State<Posted_quest> {
       isflagged = !isflagged;
     });
     // access document in fire base
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection("User Post").doc(widget.postId);
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection("Tag")
+        .doc(widget.postId)
+        .collection("Questions")
+        .doc(widget.quest_Id)
+        .collection("Answers")
+        .doc(widget.answer_postId); // require ID of question doc
 
     if (isflagged) {
       // add user to liked field
       postRef.update({
         'flages': FieldValue.arrayUnion([currentUser.email])
       });
+      reports(widget.flages.length);
     } else {
       postRef.update({
         'flages': FieldValue.arrayRemove([currentUser.email])
@@ -59,14 +72,18 @@ class _Posted_questState extends State<Posted_quest> {
     }
   }
 
-  // toggle like
   void togglelike() {
     setState(() {
       isLiked = !isLiked;
     });
     // access document in fire base
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection("User Post").doc(widget.postId);
+    DocumentReference postRef = FirebaseFirestore.instance
+        .collection("Tag")
+        .doc(widget.postId)
+        .collection("Questions")
+        .doc(widget.quest_Id)
+        .collection("Answers")
+        .doc(widget.answer_postId); // question id
 
     if (isLiked) {
       // add user to liked field
@@ -80,6 +97,8 @@ class _Posted_questState extends State<Posted_quest> {
     }
   }
 
+  /////Answer
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -88,7 +107,7 @@ class _Posted_questState extends State<Posted_quest> {
           child: ListTile(
             leading: Icon(Icons.person),
             title: Text(widget.user),
-            subtitle: Text(widget.message),
+            subtitle: Text(widget.answer),
             trailing: Column(
               children: [
                 likeButton(isLiked: isLiked, onTap: togglelike),
@@ -103,7 +122,8 @@ class _Posted_questState extends State<Posted_quest> {
             flagButton(isflagged: isflagged, onTap: toggleflag),
             Text(widget.flages.length.toString()),
           ],
-        )
+        ),
+        //
       ],
     );
   }
