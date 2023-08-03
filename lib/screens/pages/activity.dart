@@ -161,7 +161,7 @@ class _LoopingOptionsState extends State<LoopingOptions> {
       height: 400.0, // You can adjust this height as needed
       color: Colors.green, // Set the color for Option 3
       child: Center(
-        child: Text(
+      child: Text(
           'Option 3 Content',
           style: TextStyle(fontSize: 24.0, color: Colors.white),
         ),
