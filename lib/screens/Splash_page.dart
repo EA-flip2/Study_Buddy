@@ -3,11 +3,16 @@ import 'package:firetrial/authentication/auth.dart';
 import 'package:flutter/material.dart'; 
 import 'dart:async'; // Add this import for Timer 
  
-void main() { 
-  runApp(MyApp()); 
-} 
+
  
-class MyApp extends StatelessWidget { 
+class Splash extends StatefulWidget {
+  const Splash({super.key});
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
   @override 
   Widget build(BuildContext context) { 
     return MaterialApp( 

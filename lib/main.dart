@@ -1,4 +1,5 @@
 import 'package:firetrial/authentication/auth.dart';
+import 'package:firetrial/screens/Splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -31,3 +32,17 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+class Splash extends StatelessWidget { 
+  @override 
+  Widget build(BuildContext context) { 
+    return MaterialApp( 
+      debugShowCheckedModeBanner:false, 
+      title: 'Study Buddy', 
+      theme: ThemeData( 
+        primarySwatch: Colors.blue, 
+        visualDensity: VisualDensity.adaptivePlatformDensity, 
+      ), 
+      home: SplashPage(), 
+    ); 
+  } 
+} 
