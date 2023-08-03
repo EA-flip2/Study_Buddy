@@ -2,7 +2,10 @@ import 'package:firetrial/authentication/auth.dart';
 import 'package:firetrial/screens/Splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firetrial/screens/pages/option3/pomodoro.dart';
+
 import 'firebase_options.dart';
+
 
 void main() async {
   await Firebase.initializeApp(
@@ -25,24 +28,33 @@ class _MyAppState extends State<MyApp> {
   // creatings data base:
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    var materialApp = MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.amber),
       home: Auth_Page(),
+      
     );
+    return materialApp =MaterialApp(debugShowCheckedModeBanner: false,
+      title: 'Study Buddy',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: SplashPage(),
+   
+   );
+  
+ 
   }
 }
-class Splash extends StatelessWidget { 
-  @override 
-  Widget build(BuildContext context) { 
-    return MaterialApp( 
-      debugShowCheckedModeBanner:false, 
-      title: 'Study Buddy', 
-      theme: ThemeData( 
-        primarySwatch: Colors.blue, 
-        visualDensity: VisualDensity.adaptivePlatformDensity, 
-      ), 
-      home: SplashPage(), 
-    ); 
-  } 
-} 
+@override
+  Future<Widget> build(BuildContext context) async {
+    return MaterialApp(
+      home: PomodoroPage(),
+    );
+  }
+
+
+
+
+
