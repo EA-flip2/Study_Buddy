@@ -77,38 +77,68 @@ class _CommunityState extends State<Community> {
               Tags(),
               // textinput and send
               Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: quest_textcontroller,
-                      decoration: InputDecoration(
-                          hintText: "Have a Question ??",
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              quest_textcontroller.clear();
-                            },
-                            icon: Icon(Icons.clear), //clear text
-                          )),
-                      obscureText: false,
+
+children: [
+              Expanded(
+                  child: SizedBox(
+                height: 48,
+                child: TextField(
+                  controller: quest_textcontroller,
+                  decoration: InputDecoration(
+                    hintText: "Have a Question?",
+                    hintStyle: TextStyle(
+                        color: Colors.grey), // Set the hint text color to grey
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        quest_textcontroller.clear();
+                      },
+                      icon: Icon(
+                        Icons.clear,
+                        color: Colors.grey, // Set the clear icon color to grey
+                      ),
+                    ),
+                    fillColor: Colors.grey[
+                        200], // Set the background color to a lighter shade of grey
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
-
-                  // Upload
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() {
-                        postQuestion();
-                      });
-                    },
-                    color: Colors.blue,
-                    child: Icon(Icons.send),
-                  )
-                ],
+                  obscureText: false,
+                ),
+              )),
+              SizedBox(
+                width: 30,
+              ),
+              // Upload
+              SizedBox(
+                height: 48.0, // Same height as the TextField
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      postQuestion();
+                      quest_textcontroller.clear();
+                    });
+                  },
+                  child: Icon(Icons.send),
+                ),
+              ),
+              SizedBox(
+                width: 10,
               ),
             ],
-          ),
-        ],
+
       ),
-    );
-  }
+        ]
+        )]
+ )); 
+ }
 }
