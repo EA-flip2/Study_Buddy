@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart'; 
 import 'dart:async'; // Add this import for Timer 
  
-void main() { 
-  runApp(MyApp()); 
-} 
+
  
 class MyApp extends StatelessWidget { 
   @override 
