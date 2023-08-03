@@ -1,14 +1,17 @@
 
+import 'package:firetrial/authentication/auth.dart';
 import 'package:flutter/material.dart'; 
 import 'dart:async'; // Add this import for Timer 
  
-
+void main() { 
+  runApp(MyApp()); 
+} 
  
 class MyApp extends StatelessWidget { 
   @override 
   Widget build(BuildContext context) { 
     return MaterialApp( 
-      debugShowCheckedModeBanner: true, 
+      debugShowCheckedModeBanner:false, 
       title: 'Study Buddy', 
       theme: ThemeData( 
         primarySwatch: Colors.blue, 
@@ -38,7 +41,7 @@ class _SplashPageState extends State<SplashPage> {
     Timer(splashDuration, () { 
       Navigator.pushReplacement( 
         context, 
-        MaterialPageRoute(builder: (context) => MainWidget()), 
+        MaterialPageRoute(builder: (context) => const Auth_Page()), 
       ); // Replace current screen 
     }); 
   } 
