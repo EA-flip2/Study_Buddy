@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firetrial/screens/components/button.dart';
 import 'package:firetrial/screens/components/text_field.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,38 @@ class _LoginPageState extends State<LoginPage> {
   //text editing controllers
   final emailTextController = TextEditingController();
   final passswordTextController = TextEditingController();
+
+  // Google Sign-In
+  Future<void> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Show loading circle
+      showDialog(
+        context: context,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      // Hide loading circle
+      if (context.mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      // Hide loading circle
+      Navigator.pop(context);
+      displayMsg(e.code);
+    }
+  }
+
+  //added the ability/option of signing in with google account
 
   //user sign in
   void signIn() async {
@@ -55,10 +88,12 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Column(
               children: [
-                //logo
-                const Icon(
-                  Icons.lock,
-                  size: 100,
+                // Spotify-Inspired Image (Replace with your own image)
+                Image.asset(
+                  'assets/images/OIG.png',
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(
                   height: 25,
@@ -70,17 +105,19 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 //Textfied
                 MyTextField(
-                    controller: emailTextController,
-                    hintText: "Email",
-                    obscureText: false),
+                  controller: emailTextController,
+                  hintText: "Email",
+                  obscureText: false,
+                ),
                 const SizedBox(
                   height: 15,
                 ),
                 //password textfield
                 MyTextField(
-                    controller: passswordTextController,
-                    hintText: "password",
-                    obscureText: true),
+                  controller: passswordTextController,
+                  hintText: "Password",
+                  obscureText: true,
+                ),
                 const SizedBox(
                   height: 25,
                 ),
@@ -92,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Not a member?",
+                      "Don't have an account yet?",
                       style: TextStyle(
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -102,14 +139,15 @@ class _LoginPageState extends State<LoginPage> {
                       width: 5,
                     ),
                     GestureDetector(
-                        onTap: widget.onTap,
-                        child: const Text(
-                          "Join us :)",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
+                      onTap: widget.onTap,
+                      child: const Text(
+                        "Create an account",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ],
                 )
               ],
