@@ -47,8 +47,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  //added the ability/option of signing in with google account
-
   //user sign in
   void signIn() async {
     //loading circle
@@ -90,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 // Spotify-Inspired Image (Replace with your own image)
                 Image.asset(
-                  'assets/images/OIG.png',
+                  'assets/images/band.png',
                   height: 100,
                   width: 100,
                   fit: BoxFit.contain,
@@ -123,6 +121,31 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 //sigin in button
                 MyButton(onTap: signIn, text: "Sign In"),
+
+                // Google Sign-In Button
+                ElevatedButton(
+                  onPressed: _signInWithGoogle,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red, // Replace with Spotify green color or any desired color
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/images/google.png', // Replace with Google logo
+                        height: 24,
+                        width: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Sign in with Google',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
                 //go to register page
                 Row(
@@ -158,3 +181,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

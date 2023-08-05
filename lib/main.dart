@@ -2,7 +2,6 @@ import 'package:firetrial/authentication/auth.dart';
 import 'package:firetrial/screens/Splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firetrial/screens/pages/option3/pomodoro.dart';
 
 import 'firebase_options.dart';
 
