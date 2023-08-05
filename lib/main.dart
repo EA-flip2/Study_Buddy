@@ -47,12 +47,7 @@ class _MyAppState extends State<MyApp> {
  
   }
 }
-@override
-  Future<Widget> build(BuildContext context) async {
-    return MaterialApp(
-      home: PomodoroPage(),
-    );
-  }
+
 
 
 

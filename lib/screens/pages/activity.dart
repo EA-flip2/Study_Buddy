@@ -1,4 +1,5 @@
 import 'package:firetrial/activity/change_course.dart';
+import 'package:firetrial/screens/pages/option3/pomodoro.dart';
 import 'package:firetrial/tools/avaliability.dart';
 import 'package:flutter/material.dart';
 
@@ -157,16 +158,22 @@ class _LoopingOptionsState extends State<LoopingOptions> {
   }
 
   Widget _buildOption3() {
-    return Container(
-      height: 400.0, // You can adjust this height as needed
+     return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PomodoroPage()), // Replace with your NewPage widget
+      );
+    },
+     child: Container(height: 400.0, // You can adjust this height as needed
       color: Colors.green, // Set the color for Option 3
-      child: Center(
-      child: Text(
+      child: const Center(
+        child: Text(
           'Option 3 Content',
           style: TextStyle(fontSize: 24.0, color: Colors.white),
         ),
       ),
-    );
+    )); 
   }
 
   Widget _buildTableRow(String dayOfWeek) {
