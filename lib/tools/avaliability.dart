@@ -1,3 +1,4 @@
+import 'package:firetrial/activity/Schedule/select_available_time.dart';
 import 'package:flutter/material.dart';
 
 class AvailabilityPage extends StatefulWidget {
@@ -73,6 +74,17 @@ class _AvailabilityPageState extends State<AvailabilityPage> {
               },
             ),
           ),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return GridOfHours();
+                  }));
+                });
+              },
+              child: Text("Reset Avaliability")),
+          SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
               _showConfirmationDialog();
