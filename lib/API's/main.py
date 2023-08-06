@@ -1,5 +1,5 @@
 import random
-
+ 
 def normalize_weights(weights):
     total_weight = sum(weights)
     return [w / total_weight for w in weights]
