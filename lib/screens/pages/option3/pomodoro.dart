@@ -5,7 +5,7 @@ void main() {
   runApp(MaterialApp(
     home: Scaffold(
       appBar: AppBar(
-        title: Text('CheckIn'),
+        title: Text('Option 3'),
       ),
       body: Option3(),
     ),
@@ -46,6 +46,9 @@ class _PomodoroPageState extends State<PomodoroPage> {
   int currentWorkDurationIndex = 0;
   int currentBreakDurationIndex = 0;
 
+  int workSessionsCompleted = 0;
+  int breakSessionsCompleted = 0;
+
   @override
   void initState() {
     super.initState();
@@ -61,9 +64,11 @@ class _PomodoroPageState extends State<PomodoroPage> {
           if (isBreak) {
             timeRemaining = workDurations[currentWorkDurationIndex] * 60;
             isBreak = false;
+            incrementWorkSessionsCompleted();
           } else {
             timeRemaining = breakDurations[currentBreakDurationIndex] * 60;
             isBreak = true;
+            incrementBreakSessionsCompleted();
           }
         }
       });
@@ -97,6 +102,18 @@ class _PomodoroPageState extends State<PomodoroPage> {
     } else {
       stopTimer();
     }
+  }
+
+  void incrementWorkSessionsCompleted() {
+    setState(() {
+      workSessionsCompleted++;
+    });
+  }
+
+  void incrementBreakSessionsCompleted() {
+    setState(() {
+      breakSessionsCompleted++;
+    });
   }
 
   String formatTime(int seconds) {
@@ -189,6 +206,16 @@ class _PomodoroPageState extends State<PomodoroPage> {
               max: breakDurations.length - 1.toDouble(),
               divisions: breakDurations.length - 1,
               label: breakDurations[currentBreakDurationIndex].toString(),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Work Sessions Completed: $workSessionsCompleted',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Break Sessions Completed: $breakSessionsCompleted',
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
