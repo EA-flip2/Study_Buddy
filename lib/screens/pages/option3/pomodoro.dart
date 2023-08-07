@@ -79,14 +79,50 @@ class _PomodoroPageState extends State<PomodoroPage> {
         if (timeRemaining > 0) {
           timeRemaining--;
         } else {
-          // Timer is over, switch to break or work based on the current mode
+          // Timer is over, show the dialog for interval selection
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Interval'),
+                content: Text('Do you want to take a break or continue with work?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      // Continue with work
+                      timeRemaining = workDurations[currentWorkDurationIndex] * 60;
+                      isBreak = false;
+                      startTimer();
+                      Navigator.pop(context);
+                    },
+                    child: Text('Continue with Work'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Take a break
+                      timeRemaining = breakDurations[currentBreakDurationIndex] * 60;
+                      isBreak = true;
+                      startTimer();
+                      Navigator.pop(context);
+                    },
+                    child: Text('Take a Break'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          // Show encouragement message based on the interval
           if (isBreak) {
-            timeRemaining = workDurations[currentWorkDurationIndex] * 60;
-            isBreak = false;
+            showEncouragement('Great job! Take a break and relax.');
+          } else {
+            showEncouragement('Well done! Keep going with your work.');
+          }
+
+          // Show notification based on the interval
+          if (isBreak) {
             showNotification('Break Time', 'Your break time is up!');
           } else {
-            timeRemaining = breakDurations[currentBreakDurationIndex] * 60;
-            isBreak = true;
             showNotification('Work Time', 'Your work time is up!');
           }
         }
@@ -121,6 +157,15 @@ class _PomodoroPageState extends State<PomodoroPage> {
     } else {
       stopTimer();
     }
+  }
+
+  void showEncouragement(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   String formatTime(int seconds) {
