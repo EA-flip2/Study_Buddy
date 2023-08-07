@@ -1,8 +1,9 @@
-import 'package:firetrial/activity/Schedule/select_available_time.dart';
+import 'package:firetrial/activity/Schedule/schedule_algorithm.dart';
 import 'package:firetrial/activity/change_course.dart';
+import 'dart:convert';
 import 'package:firetrial/tools/avaliability.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../activity/Schedule/schedule_view.dart';
 
 class activity extends StatefulWidget {
@@ -30,10 +31,59 @@ class LoopingOptions extends StatefulWidget {
 }
 
 class _LoopingOptionsState extends State<LoopingOptions> {
+  Map<String, List<int>> selectedHours = {};
+  Map<String, List<String>> schedule = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Load the data from shared preferences when the widget is created
+    loadDataFromSharedPreferences();
+    loadDataSchedule();
+  }
+
+  void loadDataSchedule() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? jsonString = preferences.getString('current_schedule');
+    if (jsonString != null && jsonString.isNotEmpty) {
+      // If there is data in shared preferences, decode the JSON and update the schedule
+      Map<String, dynamic> decodedData = jsonDecode(jsonString);
+      setState(() {
+        schedule = {};
+        decodedData.forEach((day, courses) {
+          schedule[day] =
+              List<String>.from(courses.map((course) => course.toString()));
+        });
+      });
+    } else {
+      // If shared preferences is empty or no 'current_schedule' key is found, you can decide what to do.
+      // For example, you can initialize the schedule as an empty map or leave it as it is.
+    }
+  }
+
+  void loadDataFromSharedPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? jsonString = preferences.getString('selected_hours');
+    if (jsonString != null && jsonString.isNotEmpty) {
+      // If there is data in shared preferences, decode the JSON and update selectedHours
+      Map<String, dynamic> decodedData = jsonDecode(jsonString);
+      setState(() {
+        selectedHours = {};
+        decodedData.forEach((day, hours) {
+          selectedHours[day] =
+              List<int>.from(hours.map((hour) => int.parse(hour)));
+        });
+      });
+    } else {
+      // If shared preferences is empty, call GridOfHours to assign it
+      // You can choose to do this here or when the app first launches, depending on your use case.
+      // Example: selectedHours = GridOfHours().selectedHours;
+    }
+  }
   /*
     if shared preferences is empty, call GridofHours to assign it
     else
-    Map<String, List<int>>selectHours = what is stored sharedPreferences
+    Map<String, List<int>>selectedHours = what is stored sharedPreferences
   
    */
 
@@ -134,9 +184,12 @@ class _LoopingOptionsState extends State<LoopingOptions> {
     return InkWell(
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => GridPage()),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => SchedulePage(
+                      selectedHours: selectedHours,
+                      schedule: schedule,
+                    )));
       },
       child: Container(
         height: 300.0, // You can adjust this height as needed

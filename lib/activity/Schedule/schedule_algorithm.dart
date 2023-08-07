@@ -24,7 +24,7 @@ class CourseScheduler {
     return 0; // This should not be reached, but to satisfy the compiler.
   }
 
-  Map<String, dynamic> distributeCourses() {
+  Map<String, List<String>> distributeCourses() {
     List<String> courseNames = [
       'Course_A',
       'Course_B',
