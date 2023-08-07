@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:firetrial/activity/Schedule/schedule_algorithm.dart';
+import 'package:firetrial/screens/pages/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +34,11 @@ class _GridOfHoursState extends State<GridOfHours> {
               onPressed: () {
                 setState(() {
                   store_new_avaliability();
+                  store_new_schedule();
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return activity();
+                  }));
                 });
               },
               child: Text('Submit'),
@@ -83,21 +90,7 @@ class _GridOfHoursState extends State<GridOfHours> {
     );
   }
 
-void toggleHourSelection(String day, int hour) {
-  setState(() {
-    if (selectedHours.containsKey(day)) {
-      if (selectedHours[day]!.contains(hour)) {
-        selectedHours[day]!.remove(hour);
-      } else {
-        selectedHours[day]!.add(hour);
-      }
-    } else {
-      selectedHours[day] = [hour];
-    }
-  });
-}
-
- /* void toggleHourSelection(String day, int hour) {
+  void toggleHourSelection(String day, int hour) {
     setState(() {
       if (selectedHours.containsKey(day)) {
         if (selectedHours[day]!.contains(hour)) {
@@ -109,7 +102,7 @@ void toggleHourSelection(String day, int hour) {
         selectedHours[day] = [hour];
       }
     });
-  }*/
+  }
 
   void store_new_avaliability() async {
     SharedPreferences current_avaliable_time =
@@ -123,5 +116,18 @@ void toggleHourSelection(String day, int hour) {
     // Store the serializedHours map as a JSON string in shared preferences
     current_avaliable_time.setString(
         'selected_hours', jsonEncode(serializedHours));
+  }
+
+  void store_new_schedule() async {
+    // Calculate the current_schedule using the CourseScheduler class
+    Map<String, List<String>> current_schedule =
+        CourseScheduler(selectedHours: selectedHours).distributeCourses();
+
+    // Convert the current_schedule map to a JSON string
+    String scheduleJson = jsonEncode(current_schedule);
+
+    // Store the JSON string in shared preferences with the key 'current_schedule'
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString('current_schedule', scheduleJson);
   }
 }
