@@ -1,27 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: Scaffold(
-      appBar: AppBar(
-        title: Text('Option 3'),
-      ),
-      body: Option3(),
-    ),
-  ));
-}
-
-class Option3 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 400.0, // You can adjust this height as needed
-      color: Colors.green, // Set the color for Option 3
-      child: PomodoroPage(), // Replace the content with the PomodoroPage widget
-    );
-  }
-}
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class PomodoroPage extends StatefulWidget {
   @override
@@ -29,10 +8,10 @@ class PomodoroPage extends StatefulWidget {
 }
 
 class _PomodoroPageState extends State<PomodoroPage> {
-  int workDuration = 25;
+  int workDuration = 10;
   int breakDuration = 5;
   Timer? timer;
-  int timeRemaining = 25 * 60;
+  int timeRemaining = 10 * 60;
   bool isRunning = false;
   bool isBreak = false;
 
@@ -46,12 +25,52 @@ class _PomodoroPageState extends State<PomodoroPage> {
   int currentWorkDurationIndex = 0;
   int currentBreakDurationIndex = 0;
 
-  int workSessionsCompleted = 0;
-  int breakSessionsCompleted = 0;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
     super.initState();
+    initializeNotifications();
+  }
+
+  void initializeNotifications() async {
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+  }
+
+  void showNotification(String title, String body) async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'pomodoro_channel_id',
+      'Pomodoro Channel',
+      'Channel for Pomodoro Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
   }
 
   void startTimer() {
@@ -64,11 +83,11 @@ class _PomodoroPageState extends State<PomodoroPage> {
           if (isBreak) {
             timeRemaining = workDurations[currentWorkDurationIndex] * 60;
             isBreak = false;
-            incrementWorkSessionsCompleted();
+            showNotification('Break Time', 'Your break time is up!');
           } else {
             timeRemaining = breakDurations[currentBreakDurationIndex] * 60;
             isBreak = true;
-            incrementBreakSessionsCompleted();
+            showNotification('Work Time', 'Your work time is up!');
           }
         }
       });
@@ -102,18 +121,6 @@ class _PomodoroPageState extends State<PomodoroPage> {
     } else {
       stopTimer();
     }
-  }
-
-  void incrementWorkSessionsCompleted() {
-    setState(() {
-      workSessionsCompleted++;
-    });
-  }
-
-  void incrementBreakSessionsCompleted() {
-    setState(() {
-      breakSessionsCompleted++;
-    });
   }
 
   String formatTime(int seconds) {
@@ -206,16 +213,6 @@ class _PomodoroPageState extends State<PomodoroPage> {
               max: breakDurations.length - 1.toDouble(),
               divisions: breakDurations.length - 1,
               label: breakDurations[currentBreakDurationIndex].toString(),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Work Sessions Completed: $workSessionsCompleted',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Break Sessions Completed: $breakSessionsCompleted',
-              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
